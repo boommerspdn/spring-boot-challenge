@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -123,7 +124,7 @@ class UserControllerTest {
 
     @Test
     void getAllUsers_returnsList() throws Exception {
-        when(userService.getAllUsers()).thenReturn(List.of(userResponse));
+        when(userService.getAllUsers(isNull(), any())).thenReturn(List.of(userResponse));
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
@@ -133,7 +134,7 @@ class UserControllerTest {
 
     @Test
     void getAllUsers_emptyList_returnsEmptyArray() throws Exception {
-        when(userService.getAllUsers()).thenReturn(List.of());
+        when(userService.getAllUsers(isNull(), any())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())

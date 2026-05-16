@@ -13,12 +13,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -96,9 +101,11 @@ class UserServiceImplTest {
 
     @Test
     void getAllUsers_returnsList() {
-        when(userRepository.findAll()).thenReturn(List.of(savedUser));
+        Pageable pageable = PageRequest.of(0, 20);
+        when(userRepository.findBySearch(isNull(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(savedUser), pageable, 1));
 
-        List<UserResponse> result = userService.getAllUsers();
+        List<UserResponse> result = userService.getAllUsers(null, pageable);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getUsername()).isEqualTo("jsmith");
@@ -106,9 +113,11 @@ class UserServiceImplTest {
 
     @Test
     void getAllUsers_emptyList() {
-        when(userRepository.findAll()).thenReturn(List.of());
+        Pageable pageable = PageRequest.of(0, 20);
+        when(userRepository.findBySearch(isNull(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(), pageable, 0));
 
-        List<UserResponse> result = userService.getAllUsers();
+        List<UserResponse> result = userService.getAllUsers(null, pageable);
 
         assertThat(result).isEmpty();
     }
